@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ülke - Başkent Oyunu</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #0b82c9;
+      overflow-x: hidden;
+      color: #17324d;
+    }
+
+    .game {
+      min-height: 100vh;
+      position: relative;
+      background-image:
+        linear-gradient(to bottom, rgba(0,0,0,.08), rgba(0,0,0,.25)),
+        url("avrupa-haritasi.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .title {
+      background: linear-gradient(#a8662d, #6f3716);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 20px;
+      border: 4px solid rgba(255,255,255,.8);
+      box-shadow: 0 7px 0 #4d260f, 0 10px 18px rgba(0,0,0,.25);
+      font-size: clamp(20px, 6vw, 34px);
+      font-weight: 900;
+      letter-spacing: .5px;
+      text-shadow: 2px 3px #4b260e;
+      max-width: 68%;
+    }
+
+    .stats {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .pill {
+      background: rgba(255,246,220,.94);
+      border: 3px solid #ffffff;
+      border-radius: 18px;
+      padding: 8px 11px;
+      box-shadow: 0 5px 0 rgba(0,0,0,.22);
+      font-weight: 900;
+      font-size: 14px;
+      backdrop-filter: blur(5px);
+      white-space: nowrap;
+    }
+
+    .map-focus {
+      flex: 1;
+      min-height: 300px;
+      position: relative;
+    }
+
+    .floating-country {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 229, 79, .98);
+      color: #17324d;
+      border: 4px solid white;
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: 0 6px 0 rgba(0,0,0,.22), 0 0 0 5px rgba(255,229,79,.3);
+      display: none;
+      z-index: 3;
+      text-align: center;
+    }
+
+    .question-card {
+      width: min(680px, 100%);
+      margin: 0 auto;
+      background: rgba(255, 246, 223, .96);
+      border: 5px solid white;
+      border-radius: 28px;
+      padding: 14px;
+      box-shadow: 0 9px 0 rgba(0,0,0,.22), 0 18px 35px rgba(0,0,0,.28);
+      z-index: 4;
+      backdrop-filter: blur(5px);
+    }
+
+    .question {
+      text-align: center;
+      font-size: clamp(19px, 5vw, 30px);
+      font-weight: 900;
+      margin-bottom: 12px;
+      color: #17324d;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 18px;
+      padding: 14px 10px;
+      font-size: 17px;
+      font-weight: 900;
+      background: #ffffff;
+      color: #1d3b57;
+      box-shadow: 0 5px 0 #c9bfa8;
+      cursor: pointer;
+      transition: .15s;
+    }
+
+    button:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #c9bfa8;
+    }
+
+    .correct { background: #55c85f !important; color: white; }
+    .wrong { background: #ff6262 !important; color: white; }
+
+    .message {
+      margin-top: 10px;
+      text-align: center;
+      min-height: 26px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .controls button {
+      flex: 1;
+      background: #1f8fd5;
+      color: white;
+      box-shadow: 0 5px 0 #0b5e95;
+    }
+
+    .hint {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      background: rgba(255,255,255,.92);
+      border: 3px solid white;
+      border-radius: 18px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 0 5px 0 rgba(0,0,0,.18);
+      z-index: 2;
+      max-width: 220px;
+    }
+
+    @media (max-width: 600px) {
+      .game {
+        background-size: auto 68%;
+        background-position: center 72px;
+      }
+
+      .title {
+        max-width: 62%;
+        font-size: 20px;
+        padding: 9px 10px;
+      }
+
+      .pill {
+        font-size: 12px;
+        padding: 7px 9px;
+      }
+
+      .map-focus {
+        min-height: 360px;
+      }
+
+      .question-card {
+        padding: 12px;
+        border-radius: 24px;
+      }
+
+      .answers {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      button {
+        font-size: 15px;
+        padding: 13px 8px;
+      }
+
+      .hint {
+        display: none;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .game {
+        padding: 24px;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .question-card {
+        position: absolute;
+        left: 24px;
+        top: 130px;
+        width: 380px;
+        margin: 0;
+      }
+
+      .map-focus {
+        min-height: calc(100vh - 170px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="game">
+    <header class="topbar">
+      <div class="title">ÜLKE - BAŞKENT OYUNU</div>
+      <div class="stats">
+        <div class="pill">⭐ Puan: <span id="score">0</span></div>
+        <div class="pill">🎯 Soru: <span id="progress">1</span>/<span id="total">10</span></div>
+      </div>
+    </header>
+
+    <section class="map-focus">
+      <div class="floating-country" id="countryBadge">FRANSA</div>
+    </section>
+
+    <section class="question-card">
+      <div class="question" id="question">Fransa ülkesinin başkenti neresidir?</div>
+      <div class="answers" id="answers"></div>
+      <div class="message" id="message"></div>
+      <div class="controls">
+        <button id="nextBtn">Sonraki Soru</button>
+        <button id="restartBtn">Yeniden Başlat</button>
+      </div>
+    </section>
+
+    <div class="hint">Harita görseli için dosya adı: <br><b>avrupa-haritasi.png</b></div>
+  </main>
+
+  <script>
+    const questions = [
+      { country: "Fransa", capital: "Paris", options: ["Paris", "Berlin", "Roma", "Madrid"], x: 34, y: 57 },
+      { country: "Almanya", capital: "Berlin", options: ["Viyana", "Berlin", "Atina", "Varşova"], x: 47, y: 45 },
+      { country: "İtalya", capital: "Roma", options: ["Roma", "Paris", "Brüksel", "Lizbon"], x: 50, y: 67 },
+      { country: "İspanya", capital: "Madrid", options: ["Madrid", "Oslo", "Sofya", "Prag"], x: 23, y: 75 },
+      { country: "Türkiye", capital: "Ankara", options: ["İstanbul", "Ankara", "Bursa", "İzmir"], x: 78, y: 75 },
+      { country: "Polonya", capital: "Varşova", options: ["Varşova", "Berlin", "Budapeşte", "Paris"], x: 58, y: 49 },
+      { country: "Yunanistan", capital: "Atina", options: ["Sofya", "Atina", "Roma", "Madrid"], x: 61, y: 75 },
+      { country: "Birleşik Krallık", capital: "Londra", options: ["Dublin", "Londra", "Paris", "Amsterdam"], x: 30, y: 38 },
+      { country: "Hollanda", capital: "Amsterdam", options: ["Amsterdam", "Brüksel", "Berlin", "Kopenhag"], x: 39, y: 42 },
+      { country: "Belçika", capital: "Brüksel", options: ["Brüksel", "Paris", "Roma", "Lizbon"], x: 37, y: 49 }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let answered = false;
+
+    const questionEl = document.getElementById("question");
+    const answersEl = document.getElementById("answers");
+    const messageEl = document.getElementById("message");
+    const scoreEl = document.getElementById("score");
+    const progressEl = document.getElementById("progress");
+    const totalEl = document.getElementById("total");
+    const nextBtn = document.getElementById("nextBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const countryBadge = document.getElementById("countryBadge");
+
+    totalEl.textContent = questions.length;
+
+    function loadQuestion() {
+      answered = false;
+      const q = questions[current];
+      questionEl.textContent = `${q.country} ülkesinin başkenti neresidir?`;
+      progressEl.textContent = current + 1;
+      messageEl.textContent = "";
+      answersEl.innerHTML = "";
+
+      countryBadge.textContent = q.country.toUpperCase();
+      countryBadge.style.left = q.x + "%";
+      countryBadge.style.top = q.y + "%";
+      countryBadge.style.display = "block";
+
+      q.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = () => checkAnswer(btn, option);
+        answersEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(button, selected) {
+      if (answered) return;
+      answered = true;
+      const q = questions[current];
+      const buttons = answersEl.querySelectorAll("button");
+
+      buttons.forEach(btn => {
+        if (btn.textContent === q.capital) btn.classList.add("correct");
+      });
+
+      if (selected === q.capital) {
+        score += 10;
+        button.classList.add("correct");
+        messageEl.textContent = "Harika! Doğru cevap 🎉";
+      } else {
+        button.classList.add("wrong");
+        messageEl.textContent = `Yanlış. Doğru cevap: ${q.capital}`;
+      }
+
+      scoreEl.textContent = score;
+    }
+
+    function nextQuestion() {
+      if (current < questions.length - 1) {
+        current++;
+        loadQuestion();
+      } else {
+        questionEl.textContent = "Oyun bitti!";
+        answersEl.innerHTML = "";
+        messageEl.textContent = `Toplam puanın: ${score} / ${questions.length * 10}`;
+        countryBadge.style.display = "none";
+      }
+    }
+
+    function restartGame() {
+      current = 0;
+      score = 0;
+      scoreEl.textContent = score;
+      loadQuestion();
+    }
+
+    nextBtn.addEventListener("click", nextQuestion);
+    restartBtn.addEventListener("click", restartGame);
+
+    loadQuestion();
+  </script>
+</body>
+</html>
