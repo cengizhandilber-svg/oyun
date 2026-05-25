@@ -273,11 +273,16 @@ async function loadLeaderboard(){
     leaderList.innerHTML=list.length?"":"Henüz skor yok.";
 
     list.forEach((item,i)=>{
+      let medal = "";
+
+if(i === 0) medal = "🥇";
+else if(i === 1) medal = "🥈";
+else if(i === 2) medal = "🥉";
       const row=document.createElement("div");
       row.className="leader-row";
       row.innerHTML=`
-        <div>${i+1}.</div>
-        <div>
+<div>${medal} ${i+1}.</div>       
+<div>
           ${escapeHtml(item.name)}
           <div class="leader-small">✅ ${item.correct}/10 • ⏱️ ${formatTime(item.time)}</div>
         </div>
