@@ -117,7 +117,7 @@ const firebaseConfig={
 const app=initializeApp(firebaseConfig);
 const db=getDatabase(app);
 
-const questions=[
+const questionPool=[
   {country:"Fransa",capital:"Paris",options:["Paris","Berlin","Roma","Madrid"],x:34,y:57},
   {country:"Almanya",capital:"Berlin",options:["Viyana","Berlin","Atina","Varşova"],x:47,y:45},
   {country:"İtalya",capital:"Roma",options:["Roma","Paris","Brüksel","Lizbon"],x:50,y:67},
@@ -127,63 +127,46 @@ const questions=[
   {country:"Yunanistan",capital:"Atina",options:["Sofya","Atina","Roma","Madrid"],x:61,y:75},
   {country:"Birleşik Krallık",capital:"Londra",options:["Dublin","Londra","Paris","Amsterdam"],x:30,y:38},
   {country:"Hollanda",capital:"Amsterdam",options:["Amsterdam","Brüksel","Berlin","Kopenhag"],x:39,y:42},
-  {country:"Belçika",capital:"Brüksel",options:["Brüksel","Paris","Roma","Lizbon"],x:37,y:49}
+  {country:"Belçika",capital:"Brüksel",options:["Brüksel","Paris","Roma","Lizbon"],x:37,y:49},
+  {country:"Avusturya",capital:"Viyana",options:["Viyana","Prag","Berlin","Atina"],x:52,y:58},
+  {country:"Macaristan",capital:"Budapeşte",options:["Budapeşte","Varşova","Roma","Paris"],x:56,y:60},
+  {country:"Çekya",capital:"Prag",options:["Prag","Berlin","Brüksel","Madrid"],x:52,y:52},
+  {country:"Portekiz",capital:"Lizbon",options:["Lizbon","Madrid","Roma","Paris"],x:18,y:77},
+  {country:"Norveç",capital:"Oslo",options:["Oslo","Stockholm","Helsinki","Kopenhag"],x:46,y:18},
+  {country:"İsveç",capital:"Stockholm",options:["Stockholm","Oslo","Helsinki","Berlin"],x:53,y:22},
+  {country:"Finlandiya",capital:"Helsinki",options:["Helsinki","Oslo","Stockholm","Tallinn"],x:64,y:18},
+  {country:"Danimarka",capital:"Kopenhag",options:["Kopenhag","Amsterdam","Berlin","Oslo"],x:46,y:34},
+  {country:"Romanya",capital:"Bükreş",options:["Bükreş","Sofya","Atina","Budapeşte"],x:66,y:61},
+  {country:"Bulgaristan",capital:"Sofya",options:["Sofya","Atina","Bükreş","Ankara"],x:67,y:68},
+  {country:"İrlanda",capital:"Dublin",options:["Dublin","Londra","Oslo","Amsterdam"],x:22,y:40},
+  {country:"İsviçre",capital:"Bern",options:["Bern","Viyana","Roma","Paris"],x:43,y:58},
+  {country:"Ukrayna",capital:"Kiev",options:["Kiev","Varşova","Bükreş","Sofya"],x:78,y:50},
+  {country:"Sırbistan",capital:"Belgrad",options:["Belgrad","Budapeşte","Sofya","Atina"],x:61,y:63},
+  {country:"Hırvatistan",capital:"Zagreb",options:["Zagreb","Belgrad","Roma","Viyana"],x:55,y:61},
+  {country:"Slovakya",capital:"Bratislava",options:["Bratislava","Prag","Viyana","Budapeşte"],x:55,y:56},
+  {country:"Slovenya",capital:"Ljubljana",options:["Ljubljana","Zagreb","Viyana","Roma"],x:51,y:62},
+  {country:"Arnavutluk",capital:"Tiran",options:["Tiran","Atina","Sofya","Belgrad"],x:60,y:72},
+  {country:"Bosna Hersek",capital:"Saraybosna",options:["Saraybosna","Zagreb","Belgrad","Sofya"],x:57,y:66},
+  {country:"Estonya",capital:"Tallinn",options:["Tallinn","Riga","Helsinki","Vilnius"],x:64,y:31},
+  {country:"Letonya",capital:"Riga",options:["Riga","Tallinn","Vilnius","Varşova"],x:63,y:36},
+  {country:"Litvanya",capital:"Vilnius",options:["Vilnius","Riga","Tallinn","Varşova"],x:63,y:41},
+  {country:"Lüksemburg",capital:"Lüksemburg",options:["Lüksemburg","Brüksel","Bern","Amsterdam"],x:39,y:52},
+  {country:"Malta",capital:"Valletta",options:["Valletta","Roma","Atina","Tiran"],x:53,y:83},
+  {country:"İzlanda",capital:"Reykjavik",options:["Reykjavik","Oslo","Dublin","Helsinki"],x:16,y:13},
+  {country:"Moldova",capital:"Kişinev",options:["Kişinev","Bükreş","Kiev","Sofya"],x:72,y:58}
 ];
+
+let questions=[];
+const QUESTION_COUNT=10;
 
 let current=0,score=0,correct=0,answered=false,playerName="",startTime=0,timerInterval=null,seconds=0,finished=false,scoreSaved=false;
 const $=id=>document.getElementById(id);
 const startScreen=$("startScreen"),endScreen=$("endScreen"),startBtn=$("startBtn"),playAgainBtn=$("playAgainBtn"),playerNameInput=$("playerName"),nameError=$("nameError"),questionEl=$("question"),answersEl=$("answers"),messageEl=$("message"),scoreEl=$("score"),correctCountEl=$("correctCount"),progressEl=$("progress"),totalEl=$("total"),timerEl=$("timer"),nextBtn=$("nextBtn"),restartBtn=$("restartBtn"),countryBadge=$("countryBadge"),scoreSummary=$("scoreSummary"),leaderList=$("leaderList"),saveStatus=$("saveStatus");
 
-totalEl.textContent=questions.length;
+totalEl.textContent=QUESTION_COUNT;
 
-const banned = [
-  atob("YW1r"),
-  atob("YXE="),
-  atob("b3Jvc3B1"),
-  atob("b3Jvc3B1Y29jdWd1"),
-  atob("c2lr"),
-  atob("c2lrZXI="),
-  atob("c2lrZXlpbQ=="),
-  atob("c2lrZXJpbQ=="),
-  atob("c2lraW0="),
-  atob("cGlj"),
-  atob("cGnDp2g="),
-  atob("Z8O2dA=="),
-  atob("Z290"),
-  atob("eWFycmFr"),
-  atob("eWFyYWs="),
-  atob("aWJuZQ=="),
-  atob("b2M="),
-  atob("b8On"),
-  atob("c2FsYWs="),
-  atob("bWFs"),
-  atob("YXB0YWw="),
-  atob("Z2VyaXpla2FsxLE="),
-  atob("Z2VyaXpla2FsaQ=="),
-  atob("ZGFsbWE="),
-  atob("ZW1tZWs="),
-  atob("eWFycmFt"),
-  atob("eWFycmFtxLE="),
-  atob("cGV6ZXZlbms="),
-  atob("cHVzdA=="),
-  atob("cGl6ZXY="),
-  atob("bGFu"),
-  atob("c2V4"),
-  atob("cG9ybm8="),
-  atob("ZnVjaw=="),
-  atob("c2hpdA=="),
-  atob("Yml0Y2g="),
-  atob("YXNz"),
-  atob("aHR0cA=="),
-  atob("d3d3"),
-  atob("LmNvbQ=="),
-  atob("Lm5ldA=="),
-  atob("Lm9yZw=="),
-  atob("ZGlzY29yZA=="),
-  atob("aW5zdGFncmFt"),
-  atob("dGlrdG9r"),
-  atob("eW91dHViZQ==")
-];
+const banned=["amk","aq","orospu","sik","siker","sikeyim","piç","pic","göt","got","yarrak","yarak","salak","mal","aptal","gerizekalı","gerizekali","ibne","oc","oç","fuck","shit","sex","porno","http","www",".com",".net",".org"];
+
 function cleanName(n){return n.trim().replace(/\s+/g," ")}
 function validateName(n){
   const name=cleanName(n);
@@ -329,6 +312,8 @@ async function finishGame(){
 }
 
 function restartGame(){
+  questions=shuffle(questionPool).slice(0,QUESTION_COUNT);
+  totalEl.textContent=questions.length;
   current=0;
   score=0;
   correct=0;
@@ -337,6 +322,7 @@ function restartGame(){
   scoreSaved=false;
   scoreEl.textContent=0;
   correctCountEl.textContent=0;
+  progressEl.textContent=1;
   endScreen.classList.add("hide");
   startTimer();
   loadQuestion();
@@ -357,6 +343,8 @@ playAgainBtn.addEventListener("click",restartGame);
 nextBtn.addEventListener("click",nextQuestion);
 restartBtn.addEventListener("click",restartGame);
 
+questions=shuffle(questionPool).slice(0,QUESTION_COUNT);
+totalEl.textContent=questions.length;
 loadQuestion();
 </script>
 </body>
