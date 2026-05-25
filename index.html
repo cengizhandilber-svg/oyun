@@ -31,7 +31,53 @@ function loadQuestion(){answered=false;const q=questions[current];questionEl.tex
 function checkAnswer(button,selected){if(answered)return;answered=true;const q=questions[current];answersEl.querySelectorAll("button").forEach(btn=>{if(btn.textContent===q.capital)btn.classList.add("correct")});if(selected===q.capital){correct++;score=calculateScore();button.classList.add("correct");messageEl.textContent="Harika! Doğru cevap 🎉"}else{button.classList.add("wrong");messageEl.textContent=`Yanlış. Doğru cevap: ${q.capital}`}correctCountEl.textContent=correct;scoreEl.textContent=score}
 function nextQuestion(){if(!answered){messageEl.textContent="Önce bir cevap seçmelisin 😊";return}if(current<questions.length-1){current++;loadQuestion()}else finishGame()}
 async function saveScore(){const finalScore=calculateScore();score=finalScore;scoreEl.textContent=score;await push(ref(db,"scores"),{name:playerName,score:finalScore,correct:correct,time:seconds,date:new Date().toISOString()})}
-async function loadLeaderboard(){leaderList.textContent="Yükleniyor...";try{const q=query(ref(db,"scores"),orderByChild("score"),limitToLast(10));const snap=await get(q);let list=[];snap.forEach(child=>list.push(child.val()));list.sort((a,b)=>b.score-a.score||a.time-b.time);leaderList.innerHTML=list.length?"":"Henüz skor yok.";list.forEach((item,i)=>{const row=document.createElement("div");row.className="leader-row";row.innerHTML=`<div>${i+1}.</div><div>${escapeHtml(item.name)}<div class="leader-small">✅ ${item.correct}/10 • ⏱️ ${formatTime(item.time||0)}</div></div><div>${item.score}</div>`;leaderList.appendChild(row)})}catch(e){leaderList.textContent="Sıralama yüklenemedi."}}
+async function loadLeaderboard(){
+  leaderList.textContent = "Yükleniyor...";
+
+  try {
+    const snap = await get(ref(db, "scores"));
+    let list = [];
+
+    snap.forEach(child => {
+      const item = child.val();
+      list.push({
+        name: item.name || "Oyuncu",
+        score: Number(item.score) || 0,
+        correct: Number(item.correct) || 0,
+        time: Number(item.time) || 0
+      });
+    });
+
+    list.sort((a,b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.time - b.time;
+    });
+
+    list = list.slice(0, 10);
+
+    leaderList.innerHTML = list.length ? "" : "Henüz skor yok.";
+
+    list.forEach((item,i) => {
+      const row = document.createElement("div");
+      row.className = "leader-row";
+      row.innerHTML = `
+        <div>${i+1}.</div>
+        <div>
+          ${escapeHtml(item.name)}
+          <div class="leader-small">
+            ✅ ${item.correct}/10 • ⏱️ ${formatTime(item.time)}
+          </div>
+        </div>
+        <div>${item.score}</div>
+      `;
+      leaderList.appendChild(row);
+    });
+
+  } catch(e) {
+    leaderList.textContent = "Sıralama yüklenemedi.";
+    console.log(e);
+  }
+}
 function escapeHtml(t){return String(t).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#039;","\"":"&quot;"}[c]))}
 async function finishGame(){if(finished)return;finished=true;clearInterval(timerInterval);countryBadge.style.display="none";await saveScore().catch(()=>{});scoreSummary.innerHTML=`👤 Oyuncu: ${escapeHtml(playerName)}<br>✅ Doğru cevap: ${correct}/${questions.length}<br>⏱️ Süre: ${formatTime(seconds)}<br>⭐ Puan: ${score}`;endScreen.classList.remove("hide");loadLeaderboard()}
 function restartGame(){current=0;score=0;correct=0;answered=false;finished=false;scoreEl.textContent=0;correctCountEl.textContent=0;endScreen.classList.add("hide");startTimer();loadQuestion()}
