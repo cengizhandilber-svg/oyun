@@ -136,8 +136,54 @@ const startScreen=$("startScreen"),endScreen=$("endScreen"),startBtn=$("startBtn
 
 totalEl.textContent=questions.length;
 
-const banned=["amk","aq","orospu","sik","siker","sikeyim","piç","pic","göt","got","yarrak","yarak","salak","mal","aptal","gerizekalı","gerizekali","ibne","oc","oç","fuck","shit","sex","porno","http","www",".com",".net",".org"];
-
+const banned = [
+  atob("YW1r"),
+  atob("YXE="),
+  atob("b3Jvc3B1"),
+  atob("b3Jvc3B1Y29jdWd1"),
+  atob("c2lr"),
+  atob("c2lrZXI="),
+  atob("c2lrZXlpbQ=="),
+  atob("c2lrZXJpbQ=="),
+  atob("c2lraW0="),
+  atob("cGlj"),
+  atob("cGnDp2g="),
+  atob("Z8O2dA=="),
+  atob("Z290"),
+  atob("eWFycmFr"),
+  atob("eWFyYWs="),
+  atob("aWJuZQ=="),
+  atob("b2M="),
+  atob("b8On"),
+  atob("c2FsYWs="),
+  atob("bWFs"),
+  atob("YXB0YWw="),
+  atob("Z2VyaXpla2FsxLE="),
+  atob("Z2VyaXpla2FsaQ=="),
+  atob("ZGFsbWE="),
+  atob("ZW1tZWs="),
+  atob("eWFycmFt"),
+  atob("eWFycmFtxLE="),
+  atob("cGV6ZXZlbms="),
+  atob("cHVzdA=="),
+  atob("cGl6ZXY="),
+  atob("bGFu"),
+  atob("c2V4"),
+  atob("cG9ybm8="),
+  atob("ZnVjaw=="),
+  atob("c2hpdA=="),
+  atob("Yml0Y2g="),
+  atob("YXNz"),
+  atob("aHR0cA=="),
+  atob("d3d3"),
+  atob("LmNvbQ=="),
+  atob("Lm5ldA=="),
+  atob("Lm9yZw=="),
+  atob("ZGlzY29yZA=="),
+  atob("aW5zdGFncmFt"),
+  atob("dGlrdG9r"),
+  atob("eW91dHViZQ==")
+];
 function cleanName(n){return n.trim().replace(/\s+/g," ")}
 function validateName(n){
   const name=cleanName(n);
